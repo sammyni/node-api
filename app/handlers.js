@@ -3,11 +3,8 @@ class RequestHandler {
         // console.log(this.sendResponse());
     }
 
-    sample(res, reqData) {
-        let data = {
-            message: 'We are striving'
-        }
-        RequestHandler.SEND_RESPONSE(res, 200, data);
+    ping(res) {
+        RequestHandler.SEND_RESPONSE(res, 200);
     }
 
     notFound(res) {

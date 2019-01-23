@@ -41,8 +41,9 @@ let unifiedServer =  (req, res) => {
     req.on('end', () => {
         buffer += decoder.end();
 
+        
         // Route and Handle Request
-        let handler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : router['notFound'];
+        let handler = typeof(router[method][trimmedPath]) !== 'undefined' ? router[method][trimmedPath] : router.get.notFound;
 
         let data = {
             'trimmedPath' : trimmedPath,
