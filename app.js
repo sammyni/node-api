@@ -1,13 +1,18 @@
 
 /*
+* Created By: Samuel Ndubuisi
 * Primary file for the API
-*
 */
-//Core Node Dependencies
+
+
+//Core Node Modules
 const http = require('http');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+
+// Custom Modules
 const router = require('./app/router');
+const config = require('./config');
 
 // The server should respond to all requests with a string
 const server = http.createServer((req, res) => {
@@ -40,14 +45,8 @@ const server = http.createServer((req, res) => {
     req.on('end', () => {
         buffer += decoder.end();
 
-        // At request end, send response
-        console.log(trimmedPath);
         // Route and Handle Request
         let handler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : router['notFound'];
-
-        console.log(handler);
-        // Send the response
-        // res.end('Hello World\n');
 
         let data = {
             'trimmedPath' : trimmedPath,
@@ -60,18 +59,16 @@ const server = http.createServer((req, res) => {
         handler(res, data);
 
         // Log the request path
-        console.log(`Request received on path:`, trimmedPath);
-        console.log(`Request received with method:`, method);
-        console.log(`Request received with query string parameters:`, queryStringObject);
-        console.log(`Request received with headers:`, headers);
-        console.log('Request received with payload:', buffer);
+        // console.log(`Request received on path:`, trimmedPath);
+        // console.log(`Request received with method:`, method);
+        // console.log(`Request received with query string parameters:`, queryStringObject);
+        // console.log(`Request received with headers:`, headers);
+        // console.log('Request received with payload:', buffer);
     });
 
 });
 
 // Start the server, and have it listen on port 3000
-server.listen(5000, () => {
-    console.log('The server is listening on port 5000 now');
+server.listen(config.port, () => {
+    console.log(`The server is listening on port ${config.port} in ${config.env} environment.`);
 });
-
-// Request Router
