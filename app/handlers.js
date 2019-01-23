@@ -19,6 +19,7 @@ class RequestHandler {
         data = typeof(data) == 'object' ? data : new Object();
         let dataString = JSON.stringify(data);
 
+        res.setHeader('Content-Type', 'application/json');
         res.writeHead(statusCode);
         res.end(dataString);
     }
