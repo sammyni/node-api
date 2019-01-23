@@ -6,69 +6,34 @@
 
 
 //Core Node Modules
+const fs = require('fs');
 const http = require('http');
-const url = require('url');
-const StringDecoder = require('string_decoder').StringDecoder;
+const https = require('https');
 
 // Custom Modules
-const router = require('./app/router');
 const config = require('./config');
+const serverLogic = require('./app/server');
 
-// The server should respond to all requests with a string
-const server = http.createServer((req, res) => {
-
-    // Get request url and parse it
-    let parsedUrl = url.parse(req.url, true);
-
-    // Get the path
-    let path = parsedUrl.pathname;
-    let trimmedPath = path.replace(/^\/+|\/+s/g, '');
-
-    // Get the HTTP Request Method
-    let method = req.method.toLowerCase();
-
-    // Get Query String as an object
-    let queryStringObject = parsedUrl.query;
-
-    // Get the headers as an object
-    let headers = req.headers;
-
-
-    let decoder = new StringDecoder('utf-8');
-    let buffer = '';
-
-    // Parsing payload
-    req.on('data', (data) => {
-        buffer += decoder.write(data);
-    });
-
-    req.on('end', () => {
-        buffer += decoder.end();
-
-        // Route and Handle Request
-        let handler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : router['notFound'];
-
-        let data = {
-            'trimmedPath' : trimmedPath,
-            'query' : queryStringObject,
-            'method' : method,
-            'headers' : headers,
-            'payload' : buffer
-        };
-
-        handler(res, data);
-
-        // Log the request path
-        // console.log(`Request received on path:`, trimmedPath);
-        // console.log(`Request received with method:`, method);
-        // console.log(`Request received with query string parameters:`, queryStringObject);
-        // console.log(`Request received with headers:`, headers);
-        // console.log('Request received with payload:', buffer);
-    });
-
+// Instantiate the HTTP server
+const httpServer = http.createServer((req, res) => {
+    serverLogic(req, res);
 });
 
-// Start the server, and have it listen on port 3000
-server.listen(config.port, () => {
-    console.log(`The server is listening on port ${config.port} in ${config.env} environment.`);
+// Start the HPPT server
+httpServer.listen(config.httpPort, () => {
+    console.log(`The server is listening on port ${config.httpPort} in ${config.env} environment.`);
+});
+
+// Instantiate the HTTPS server
+const httpsServerOptions = new Object();
+httpsServerOptions.key = fs.readFileSync('./https/key.pem');
+httpsServerOptions.cert = fs.readFileSync('./https/cert.pem');
+
+const httpsServer = https.createServer(httpsServerOptions, (req, res) => {
+    serverLogic(req, res);
+});
+
+// Start the HPPT server
+httpsServer.listen(config.httpsPort, () => {
+    console.log(`The https server is listening on port ${config.httpsPort} in ${config.env} environment.`);
 });

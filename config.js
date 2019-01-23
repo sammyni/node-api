@@ -9,7 +9,8 @@ let env = {};
 
 env.config = {
     name: 'RESTful API',
-    port: 3000,
+    httpPort: 3000,
+    httpsPort: 3001
 }
 
 // Default  environment (staging)
@@ -22,12 +23,14 @@ env.development = {
 };
 
 env.production = {
-    port: 5000,
+    httpPort: 5000,
+    httpsPort: 5001,
     env: 'production'
 };
 
 env.testing = {
-    port: 8080,
+    httpPort: 8080,
+    httpsPort: 8081,
     env: 'testing',
 }
 
