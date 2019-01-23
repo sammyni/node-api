@@ -7,6 +7,7 @@
 const http = require('http');
 const url = require('url');
 const StringDecoder = require('string_decoder').StringDecoder;
+const router = require('./app/router');
 
 // The server should respond to all requests with a string
 const server = http.createServer((req, res) => {
@@ -40,9 +41,23 @@ const server = http.createServer((req, res) => {
         buffer += decoder.end();
 
         // At request end, send response
+        console.log(trimmedPath);
+        // Route and Handle Request
+        let handler = typeof(router[trimmedPath]) !== 'undefined' ? router[trimmedPath] : router['notFound'];
 
+        console.log(handler);
         // Send the response
-        res.end('Hello World\n');
+        // res.end('Hello World\n');
+
+        let data = {
+            'trimmedPath' : trimmedPath,
+            'query' : queryStringObject,
+            'method' : method,
+            'headers' : headers,
+            'payload' : buffer
+        };
+
+        handler(res, data);
 
         // Log the request path
         console.log(`Request received on path:`, trimmedPath);
@@ -58,3 +73,5 @@ const server = http.createServer((req, res) => {
 server.listen(5000, () => {
     console.log('The server is listening on port 5000 now');
 });
+
+// Request Router
